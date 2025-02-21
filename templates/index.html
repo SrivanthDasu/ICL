@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Science Lab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Virtual Science Lab</h1>
+    </header>
+    <div class="container">
+        <div class="experiment-card">
+            <h2>Free Lab</h2>
+            <p>Drag and drop elements to mix them and see what you can create!</p>
+            <a href="{{ url_for('free_lab') }}">Start Free Lab</a>
+        </div>
+        <h2>Choose an Experiment</h2>
+        {% for experiment_id, experiment in experiments.items() %}
+            <div class="experiment-card">
+                <h2>{{ experiment.name }}</h2>
+                <p>{{ experiment.description }}</p>
+                <a href="{{ url_for('experiment', experiment_id=experiment_id) }}">Start Experiment</a>
+            </div>
+        {% endfor %}
+    </div>
+    <footer>
+        <p>&copy; 2024 Virtual Science Lab. All rights reserved.</p>
+    </footer>
+</body>
+</html>

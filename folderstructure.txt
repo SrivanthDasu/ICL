@@ -1,0 +1,8 @@
+virtual_science_lab/
+│
+├── app.py                  # Flask backend
+├── templates/              # HTML templates
+│   ├── index.html          # Homepage
+│   ├── experiment.html     # Experiment page
+├── static/                 # CSS and JavaScript files
+│   ├── style.css           # CSS for styling

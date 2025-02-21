@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Lab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+        }
+        .element {
+            padding: 10px;
+            text-align: center;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            cursor: grab;
+        }
+        .mixing-area {
+            width: 300px;
+            height: 100px;
+            border: 2px dashed #ccc;
+            margin: 20px 0;
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .mixing-area h3 {
+            width: 100%;
+            margin: 0;
+        }
+        .mixed-element {
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #2ecc71;
+            color: white;
+            border-radius: 5px;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Free Lab</h1>
+    </header>
+    <div class="container">
+        <h2>Drag and Drop Elements to Mix Them</h2>
+        <div class="periodic-table">
+            {% for element in periodic_table %}
+                <div class="element" draggable="true" data-element="{{ element }}">{{ element }}</div>
+            {% endfor %}
+        </div>
+        <div class="mixing-area" id="mixing-area">
+            <h3>Mixing Area</h3>
+        </div>
+        <button id="mix-button">Mix</button>
+        <button id="reset-button">Reset</button>
+        <div id="result"></div>
+        <div style="margin-top: 20px;">
+            <a href="{{ url_for('index') }}" class="btn-home">Go Back to Home</a>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Virtual Science Lab. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const mixingArea = document.getElementById("mixing-area");
+        const mixButton = document.getElementById("mix-button");
+        const resetButton = document.getElementById("reset-button");
+        const resultDiv = document.getElementById("result");
+
+        let selectedElements = [];
+
+        // Allow dragging elements into the mixing area
+        document.querySelectorAll(".element").forEach((element) => {
+            element.addEventListener("dragstart", (e) => {
+                e.dataTransfer.setData("text/plain", e.target.dataset.element);
+            });
+        });
+
+        mixingArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+
+        mixingArea.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const element = e.dataTransfer.getData("text/plain");
+
+            // Prevent duplicate elements
+            if (!selectedElements.includes(element)) {
+                selectedElements.push(element);
+
+                // Create a new element in the mixing area
+                const mixedElement = document.createElement("div");
+                mixedElement.classList.add("mixed-element");
+                mixedElement.textContent = element;
+                mixingArea.appendChild(mixedElement);
+            }
+        });
+
+        // Handle mixing
+        mixButton.addEventListener("click", async () => {
+    if (selectedElements.length === 0) {
+        resultDiv.innerHTML = `<div style="color: red;">Please select elements to mix.</div>`;
+        return;
+    }
+
+    const response = await fetch("/mix-elements", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ elements: selectedElements }),
+    });
+
+    try {
+        const data = await response.json();
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div style="color: green;">${data.message}</div>
+                <div style="margin-top: 10px; color: #2e7d32;">${data.description}</div>
+            `;
+        } else {
+            resultDiv.innerHTML = `<div style="color: red;">${data.message}</div>`;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `<div style="color: red;">Error processing request. Please try again.</div>`;
+    }
+});
+
+
+        // Handle reset
+        resetButton.addEventListener("click", () => {
+            selectedElements = [];
+            mixingArea.innerHTML = "<h3>Mixing Area</h3>";
+            resultDiv.innerHTML = "";
+        });
+    </script>
+</body>
+</html>

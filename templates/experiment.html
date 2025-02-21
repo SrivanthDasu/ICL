@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ experiment.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Virtual Science Lab</h1>
+    </header>
+    <div class="container">
+        <div class="experiment-card">
+            <h2>{{ experiment.name }}</h2>
+            <p>{{ experiment.description }}</p>
+            <form method="POST">
+                <h3>Select Reactants:</h3>
+                {% for reactant in experiment.reactants %}
+                    <label>
+                        <input type="checkbox" name="reactants" value="{{ reactant }}"> {{ reactant }}
+                    </label><br>
+                {% endfor %}
+                <button type="submit">Mix</button>
+            </form>
+
+            {% if result %}
+                <div id="result" class="{% if result.success %}success{% else %}failure{% endif %}">
+                    {{ result.message }}
+                </div>
+                {% if result.success %}
+                    <div class="fun-fact">
+                        <h3>Fun Fact:</h3>
+                        <p>{{ result.fun_fact }}</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <!-- Go Back to Home Button -->
+            <div style="margin-top: 20px;">
+                <a href="{{ url_for('index') }}" class="btn-home">Go Back to Home</a>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Virtual Science Lab. All rights reserved.</p>
+    </footer>
+</body>
+</html>
